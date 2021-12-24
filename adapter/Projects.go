@@ -9,7 +9,7 @@ import (
 type Project struct {
 	ID      uuid.UUID `json:"id,omitempty" db:"id"`
 	Name    string    `json:"name" db:"name"`
-	SpaceID string    `json:"space_id" db:"space_id"`
+	SpaceID uuid.UUID `json:"space_id" db:"space_id"`
 }
 
 func (p Project) Create() (sql.Result, error) {
