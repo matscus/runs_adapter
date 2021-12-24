@@ -11,16 +11,21 @@ import (
 )
 
 type Run struct {
-	ID         uuid.UUID `json:"id" db:"id"`
-	RunID      int       `json:"run_id" db:"run_id"`
-	SpaceID    uuid.UUID `json:"space_id" db:"space_id"`
-	ProjectID  uuid.UUID `json:"project_id" db:"project_id"`
-	ReleaseID  uuid.UUID `json:"release_id" db:"release_id"`
-	TestTypeID uuid.UUID `json:"test_type_id" db:"test_type_id"`
-	VersionID  uuid.UUID `json:"version_id" db:"version_id"`
-	StartTime  time.Time `json:"start_time,omitempty" db:"start_time"`
-	EndTime    time.Time `json:"end_time,omitempty" db:"end_time"`
-	Data       Data      `json:"data" db:"data"`
+	ID           uuid.UUID `json:"id" db:"id"`
+	RunID        int       `json:"run_id" db:"run_id"`
+	SpaceID      uuid.UUID `json:"space_id,omitempty" db:"space_id"`
+	ProjectID    uuid.UUID `json:"project_id,omitempty" db:"project_id"`
+	ReleaseID    uuid.UUID `json:"release_id,omitempty" db:"release_id"`
+	TestTypeID   uuid.UUID `json:"test_type_id,omitempty" db:"test_type_id"`
+	VersionID    uuid.UUID `json:"version_id,omitempty" db:"version_id"`
+	SpaceName    string    `json:"space_name,omitempty"`
+	ProjectName  string    `json:"project_name,omitempty"`
+	ReleaseName  string    `json:"release_name,omitempty"`
+	TestTypeName string    `json:"testtype_name,omitempty"`
+	VersionName  string    `json:"version_name,omitempty"`
+	StartTime    time.Time `json:"start_time,omitempty" db:"start_time"`
+	EndTime      time.Time `json:"end_time,omitempty" db:"end_time"`
+	Data         Data      `json:"data" db:"data"`
 }
 
 type Data struct {
