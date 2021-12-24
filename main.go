@@ -118,8 +118,8 @@ func main() {
 	}
 
 	srv := &http.Server{
-		//Addr:         host + ":" + listenport,
-		Addr:         "0.0.0.0:" + listenport,
+		Addr: host + ":" + listenport,
+		// Addr:         "0.0.0.0:" + listenport,
 		WriteTimeout: writeTimeout,
 		ReadTimeout:  readTimeout,
 		IdleTimeout:  idleTimeout,
