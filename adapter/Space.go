@@ -8,7 +8,7 @@ import (
 
 type Space struct {
 	ID       uuid.UUID `json:"id" db:"id"`
-	Name     string    `json:"name" db:"name"`
+	Name     string    `json:"name" binding:"required" db:"name"`
 	Login    string    `json:"login" db:"login"`
 	Password string    `json:"password" db:"password"`
 }

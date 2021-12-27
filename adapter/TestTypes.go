@@ -8,8 +8,8 @@ import (
 
 type TestType struct {
 	ID        uuid.UUID `json:"id" db:"id"`
-	Name      string    `json:"name" db:"name"`
-	ProjectID uuid.UUID `json:"project_id" db:"project_id"`
+	Name      string    `json:"name" binding:"required" db:"name"`
+	ProjectID uuid.UUID `json:"project_id" binding:"required" db:"project_id"`
 }
 
 func (t TestType) Create() (sql.Result, error) {

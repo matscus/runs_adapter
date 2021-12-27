@@ -9,9 +9,9 @@ import (
 
 type Version struct {
 	ID              uuid.UUID `json:"id" db:"id"`
-	Name            string    `json:"name" db:"name"`
+	Name            string    `json:"name" binding:"required" db:"name"`
 	VersionDateTime time.Time `json:"version_date_time" db:"version_date_time"`
-	ReleaseID       uuid.UUID `json:"release_id" db:"release_id"`
+	ReleaseID       uuid.UUID `json:"release_id" binding:"required" db:"release_id"`
 }
 
 func (v Version) Create() (sql.Result, error) {

@@ -9,9 +9,9 @@ import (
 
 type Release struct {
 	ID              uuid.UUID `json:"id" db:"id"`
-	Name            string    `json:"name" db:"name"`
+	Name            string    `json:"name" binding:"required" db:"name"`
 	ReleaseDateTime time.Time `json:"release_date_time" db:"release_date_time"`
-	ProjectID       uuid.UUID `json:"project_id" db:"project_id"`
+	ProjectID       uuid.UUID `json:"project_id" binding:"required" db:"project_id"`
 }
 
 func (r Release) Create() (sql.Result, error) {

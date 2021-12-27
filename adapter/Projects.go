@@ -8,8 +8,8 @@ import (
 
 type Project struct {
 	ID      uuid.UUID `json:"id,omitempty" db:"id"`
-	Name    string    `json:"name" db:"name"`
-	SpaceID uuid.UUID `json:"space_id" db:"space_id"`
+	Name    string    `json:"name" binding:"required" db:"name"`
+	SpaceID uuid.UUID `json:"space_id" binding:"required" db:"space_id"`
 }
 
 func (p Project) Create() (sql.Result, error) {

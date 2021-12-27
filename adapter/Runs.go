@@ -12,20 +12,20 @@ import (
 
 type Run struct {
 	ID           uuid.UUID `json:"id" db:"id"`
-	RunID        int       `json:"run_id" db:"run_id"`
-	SpaceID      uuid.UUID `json:"space_id,omitempty" db:"space_id"`
-	ProjectID    uuid.UUID `json:"project_id,omitempty" db:"project_id"`
-	ReleaseID    uuid.UUID `json:"release_id,omitempty" db:"release_id"`
-	TestTypeID   uuid.UUID `json:"test_type_id,omitempty" db:"test_type_id"`
-	VersionID    uuid.UUID `json:"version_id,omitempty" db:"version_id"`
-	SpaceName    string    `json:"space_name,omitempty"`
-	ProjectName  string    `json:"project_name,omitempty"`
-	ReleaseName  string    `json:"release_name,omitempty"`
-	TestTypeName string    `json:"testtype_name,omitempty"`
-	VersionName  string    `json:"version_name,omitempty"`
-	StartTime    time.Time `json:"start_time,omitempty" db:"start_time"`
+	RunID        int       `json:"run_id" binding:"required" db:"run_id"`
+	SpaceID      uuid.UUID `json:"space_id" db:"space_id"`
+	ProjectID    uuid.UUID `json:"project_id" db:"project_id"`
+	ReleaseID    uuid.UUID `json:"release_id" db:"release_id"`
+	TestTypeID   uuid.UUID `json:"test_type_id" db:"test_type_id"`
+	VersionID    uuid.UUID `json:"version_id" db:"version_id"`
+	SpaceName    string    `json:"space_name" binding:"required" db:"space_name"`
+	ProjectName  string    `json:"project_name" binding:"required" db:"project_name"`
+	ReleaseName  string    `json:"release_name" binding:"required" db:"release_name"`
+	VersionName  string    `json:"version_name" binding:"required" db:"version_name"`
+	TestTypeName string    `json:"testtype_name" binding:"required" db:"testtype_name"`
+	StartTime    time.Time `json:"start_time,omitempty" binding:"required" db:"start_time"`
 	EndTime      time.Time `json:"end_time,omitempty" db:"end_time"`
-	Data         Data      `json:"data" db:"data"`
+	Data         Data      `json:"data" binding:"required" db:"data"`
 }
 
 type Data struct {
@@ -48,7 +48,7 @@ func (r Run) Create() (sql.Result, error) {
 }
 
 func (r Run) Update() (sql.Result, error) {
-	return DB.Exec(`UPDATE tests.tRuns SET run_id=$1,space_id=$2,project_id=$3,release_id=$4,version_id=$5,test_type_id=$6,start_time=$7,end_time=$8,data=$9 WHERE id=$10`, r.RunID, r.SpaceID, r.ProjectID, r.VersionID, r.ReleaseID, r.TestTypeID, r.StartTime, r.EndTime, r.Data, r.ID)
+	return DB.Exec(`UPDATE tests.tRuns SET run_id=$1,space_id=$2,project_id=$3,release_id=$4,version_id=$5,test_type_id=$6,start_time=$7,end_time=$8,data=$9 WHERE id=$10`, r.RunID, r.SpaceID, r.ProjectID, r.ReleaseID, r.VersionID, r.TestTypeID, r.StartTime, r.EndTime, r.Data, r.ID)
 }
 
 func (r Run) Delete() (sql.Result, error) {
@@ -56,7 +56,7 @@ func (r Run) Delete() (sql.Result, error) {
 }
 
 func GetAllRuns() (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t")
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id")
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
@@ -68,23 +68,19 @@ func GetLastRunID(schema string, project string) (result int, err error) {
 }
 
 func GetRuns(schema string, project string, limit int) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id INNER JOIN tests.tProjects AS p ON t.project_id = p.id WHERE s.name=$1 AND p.name=$2 ORDER BY run_id DESC LIMIT $3", schema, project, limit)
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE s.name=$1 AND p.name=$2 ORDER BY run_id DESC LIMIT $3", schema, project, limit)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
 	return result, err
 }
 
-func GetRunByID(id uuid.UUID) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT id,run_id,space_id,project_id,release_id,test_type_id,version_id,start_time,end_time,data FROM tests.tRuns WHERE id = $1", id)
-	if err == nil && result == nil {
-		return nil, sql.ErrNoRows
-	}
-	return result, err
+func GetRunByID(id uuid.UUID) (result Run, err error) {
+	return result, DB.Get(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE test.id = $1", id)
 }
 
 func GetAllRunsBySpace(schema string) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id WHERE s.name=$1", schema)
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE s.name=$1", schema)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
@@ -92,7 +88,7 @@ func GetAllRunsBySpace(schema string) (result []Run, err error) {
 }
 
 func GetAllRunsByProject(schema string, project string) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id INNER JOIN tests.tProjects AS p ON t.project_id = p.id WHERE s.name=$1 AND p.name=$2", schema, project)
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE s.name=$1 AND p.name=$2", schema, project)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
@@ -100,7 +96,7 @@ func GetAllRunsByProject(schema string, project string) (result []Run, err error
 }
 
 func GetAllRunsByRelease(schema string, project string, release string) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id INNER JOIN tests.tProjects AS p ON t.project_id = p.id INNER JOIN tests.tReleases AS r ON t.release_id = r.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3", schema, project, release)
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3", schema, project, release)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
@@ -108,7 +104,7 @@ func GetAllRunsByRelease(schema string, project string, release string) (result 
 }
 
 func GetAllRunsByVersion(schema string, project string, release string, version string) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id INNER JOIN tests.tProjects AS p ON t.project_id = p.id INNER JOIN tests.tReleases AS r ON t.release_id = r.id INNER JOIN tests.tVersions AS v ON t.version_id = v.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3 AND v.name=$4", schema, project, release, version)
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3 AND v.name=$4", schema, project, release, version)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
@@ -116,7 +112,7 @@ func GetAllRunsByVersion(schema string, project string, release string, version 
 }
 
 func GetAllRunsByTestType(schema string, project string, release string, version string, testType string) (result []Run, err error) {
-	err = DB.Select(&result, "SELECT t.id,t.run_id,t.space_id,t.project_id,t.release_id,t.test_type_id,t.version_id,t.start_time,t.end_time,t.data FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id INNER JOIN tests.tProjects AS p ON t.project_id = p.id INNER JOIN tests.tReleases AS r ON t.release_id = r.id INNER JOIN tests.tVersions AS v ON t.version_id = v.id INNER JOIN tests.tTestTypes AS tt  ON t.test_type_id = tt.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3 AND v.name=$4 AND tt.name=$5", schema, project, release, version, testType)
+	err = DB.Select(&result, "SELECT test.id,test.run_id,test.space_id,s.name AS space_name, test.project_id, p.name AS project_name, test.release_id, r.name AS release_name, test.version_id, v.name AS version_name, test.test_type_id, t.name  AS testtype_name, test.start_time, test.end_time, test.data FROM tests.tRuns AS test INNER JOIN tests.tSpaces AS s ON test.space_id = s.id INNER JOIN tests.tProjects AS p ON test.project_id = p.id INNER JOIN tests.tReleases AS r ON test.release_id = r.id INNER JOIN tests.tVersions AS v ON test.version_id = v.id INNER JOIN tests.tTestTypes AS t ON test.test_type_id = t.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3 AND v.name=$4 AND t.name=$5", schema, project, release, version, testType)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
