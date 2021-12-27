@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -45,13 +43,8 @@ func Spaces(c *gin.Context) {
 			return
 		}
 	case http.MethodPost:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		space := adapter.Space{}
-		err = json.Unmarshal(body, &space)
+		err := c.BindJSON(&space)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
@@ -65,13 +58,8 @@ func Spaces(c *gin.Context) {
 		c.JSON(200, gin.H{"Status": "ok", "Message": "Space created", "ID": space.ID.String()})
 		return
 	case http.MethodPut:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		space := adapter.Space{}
-		err = json.Unmarshal(body, &space)
+		err := c.BindJSON(&space)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return

@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -38,121 +36,91 @@ func Runs(c *gin.Context) {
 			return
 		}
 	case http.MethodPost:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		run := adapter.Run{}
-		err = json.Unmarshal(body, &run)
+		err := c.BindJSON(&run)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
 		}
 		run.ID = uuid.New()
 		if run.SpaceID == nilUUID {
-			if run.SpaceName != "" {
-				run.SpaceID, err = adapter.GetSpaceID(run.SpaceName)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						run.SpaceID = uuid.New()
-						_, err = adapter.Space{ID: run.SpaceID, Name: run.SpaceName}.Create()
-						if err != nil {
-							CheckSQLError(c, err)
-							return
-						}
-					} else {
+			run.SpaceID, err = adapter.GetSpaceID(run.SpaceName)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					run.SpaceID = uuid.New()
+					_, err = adapter.Space{ID: run.SpaceID, Name: run.SpaceName}.Create()
+					if err != nil {
 						CheckSQLError(c, err)
 						return
 					}
+				} else {
+					CheckSQLError(c, err)
+					return
 				}
-			} else {
-				c.JSON(400, gin.H{"Status": "error", "Message": "Fields space_id and space_name not found"})
-				return
 			}
 		}
 		if run.ProjectID == nilUUID {
-			if run.ProjectName != "" {
-				run.ProjectID, err = adapter.GetProjectID(run.SpaceID, run.ProjectName)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						run.ProjectID = uuid.New()
-						_, err = adapter.Project{ID: run.ProjectID, Name: run.ProjectName, SpaceID: run.SpaceID}.Create()
-						if err != nil {
-							CheckSQLError(c, err)
-							return
-						}
-					} else {
+			run.ProjectID, err = adapter.GetProjectID(run.SpaceID, run.ProjectName)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					run.ProjectID = uuid.New()
+					_, err = adapter.Project{ID: run.ProjectID, Name: run.ProjectName, SpaceID: run.SpaceID}.Create()
+					if err != nil {
 						CheckSQLError(c, err)
 						return
 					}
+				} else {
+					CheckSQLError(c, err)
+					return
 				}
-			} else {
-				c.JSON(400, gin.H{"Status": "error", "Message": "Fields project_id andp roject_name not found"})
-				return
 			}
 		}
 		if run.ReleaseID == nilUUID {
-			if run.ReleaseName != "" {
-				run.ReleaseID, err = adapter.GetReleaseID(run.ProjectID, run.ReleaseName)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						run.ReleaseID = uuid.New()
-						_, err = adapter.Release{ID: run.ReleaseID, Name: run.ReleaseName, ProjectID: run.ProjectID}.Create()
-						if err != nil {
-							CheckSQLError(c, err)
-							return
-						}
-					} else {
+			run.ReleaseID, err = adapter.GetReleaseID(run.ProjectID, run.ReleaseName)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					run.ReleaseID = uuid.New()
+					_, err = adapter.Release{ID: run.ReleaseID, Name: run.ReleaseName, ProjectID: run.ProjectID}.Create()
+					if err != nil {
 						CheckSQLError(c, err)
 						return
 					}
+				} else {
+					CheckSQLError(c, err)
+					return
 				}
-			} else {
-				c.JSON(400, gin.H{"Status": "error", "Message": "Fields release_id and release_name not found"})
-				return
 			}
 		}
 		if run.VersionID == nilUUID {
-			if run.VersionName != "" {
-				run.VersionID, err = adapter.GetVersionID(run.ReleaseID, run.VersionName)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						run.VersionID = uuid.New()
-						_, err = adapter.Version{ID: run.VersionID, Name: run.VersionName, ReleaseID: run.ReleaseID}.Create()
-						if err != nil {
-							CheckSQLError(c, err)
-							return
-						}
-					} else {
+			run.VersionID, err = adapter.GetVersionID(run.ReleaseID, run.VersionName)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					run.VersionID = uuid.New()
+					_, err = adapter.Version{ID: run.VersionID, Name: run.VersionName, ReleaseID: run.ReleaseID}.Create()
+					if err != nil {
 						CheckSQLError(c, err)
 						return
 					}
+				} else {
+					CheckSQLError(c, err)
+					return
 				}
-			} else {
-				c.JSON(400, gin.H{"Status": "error", "Message": "Fields version_id and version_name not found"})
-				return
 			}
 		}
 		if run.TestTypeID == nilUUID {
-			if run.TestTypeName != "" {
-				run.TestTypeID, err = adapter.GetTestTypeID(run.ProjectID, run.TestTypeName)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						run.TestTypeID = uuid.New()
-						_, err = adapter.TestType{ID: run.TestTypeID, Name: run.TestTypeName, ProjectID: run.ProjectID}.Create()
-						if err != nil {
-							CheckSQLError(c, err)
-							return
-						}
-					} else {
+			run.TestTypeID, err = adapter.GetTestTypeID(run.ProjectID, run.TestTypeName)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					run.TestTypeID = uuid.New()
+					_, err = adapter.TestType{ID: run.TestTypeID, Name: run.TestTypeName, ProjectID: run.ProjectID}.Create()
+					if err != nil {
 						CheckSQLError(c, err)
 						return
 					}
+				} else {
+					CheckSQLError(c, err)
+					return
 				}
-			} else {
-				c.JSON(400, gin.H{"Status": "error", "Message": "Fields testtype_id and testtype_name not found"})
-				return
 			}
 		}
 		if run.RunID == 0 {
@@ -167,24 +135,18 @@ func Runs(c *gin.Context) {
 		c.JSON(200, gin.H{"Status": "ok", "Message": "Run created", "ID": run.ID.String()})
 		return
 	case http.MethodPut:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		run := adapter.Run{}
-		err = json.Unmarshal(body, &run)
+		err := c.BindJSON(&run)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
 		}
-		run.ID = uuid.New()
 		_, err = run.Update()
 		if err != nil {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Run created", "ID": run.ID.String()})
+		c.JSON(200, gin.H{"Status": "ok", "Message": "Run updated", "ID": run.ID.String()})
 		return
 	case http.MethodDelete:
 		id := c.Query("id")

@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -52,13 +50,8 @@ func Projects(c *gin.Context) {
 		c.JSON(200, res)
 		return
 	case http.MethodPost:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		project := adapter.Project{}
-		err = json.Unmarshal(body, &project)
+		err := c.BindJSON(&project)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
@@ -72,13 +65,8 @@ func Projects(c *gin.Context) {
 		c.JSON(200, gin.H{"Status": "ok", "Message": "Project created", "ID": project.ID.String()})
 		return
 	case http.MethodPut:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		project := adapter.Project{}
-		err = json.Unmarshal(body, &project)
+		err := c.BindJSON(&project)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return

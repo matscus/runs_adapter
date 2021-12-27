@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -62,13 +60,8 @@ func Versions(c *gin.Context) {
 		c.JSON(200, res)
 		return
 	case http.MethodPost:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		version := adapter.Version{}
-		err = json.Unmarshal(body, &version)
+		err := c.BindJSON(&version)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
@@ -82,13 +75,8 @@ func Versions(c *gin.Context) {
 		c.JSON(200, gin.H{"Status": "ok", "Message": "Version created", "ID": version.ID.String()})
 		return
 	case http.MethodPut:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		version := adapter.Version{}
-		err = json.Unmarshal(body, &version)
+		err := c.BindJSON(&version)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return

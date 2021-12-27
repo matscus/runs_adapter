@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -57,13 +55,8 @@ func TestTypes(c *gin.Context) {
 		c.JSON(200, res)
 		return
 	case http.MethodPost:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		testType := adapter.TestType{}
-		err = json.Unmarshal(body, &testType)
+		err := c.BindJSON(&testType)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
@@ -77,13 +70,8 @@ func TestTypes(c *gin.Context) {
 		c.JSON(200, gin.H{"Status": "ok", "Message": "Test type created", "ID": testType.ID.String()})
 		return
 	case http.MethodPut:
-		body, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
-			return
-		}
 		testType := adapter.TestType{}
-		err = json.Unmarshal(body, &testType)
+		err := c.BindJSON(&testType)
 		if err != nil {
 			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
 			return
