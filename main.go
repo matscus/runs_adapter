@@ -46,8 +46,24 @@ func main() {
 	flag.IntVar(&dbport, "dbport", 5432, "db port")
 	flag.StringVar(&dbname, "dbname", "test", "db name")
 	flag.Parse()
+
 	if !debug {
 		gin.SetMode(gin.ReleaseMode)
+		addrs, err := net.InterfaceAddrs()
+		if err != nil {
+			log.Error("Get interface adress error: ", err.Error())
+			os.Exit(1)
+		}
+		for _, a := range addrs {
+			if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					host = fmt.Sprintf("%s:%s", ipnet.IP.String(), listenport)
+				}
+			}
+		}
+
+	} else {
+		host = fmt.Sprintf("%s:%s", "0.0.0.0", listenport)
 	}
 	var router *gin.Engine
 	if logger {
@@ -80,6 +96,7 @@ func main() {
 		v1.Any("/releases", handlers.Releases)
 		v1.Any("/versions", handlers.Versions)
 		v1.Any("/testtypes", handlers.TestTypes)
+		v1.Any("/profiles", handlers.Profiles)
 		runs := v1.Group("/runs")
 		{
 			runs.Any("/", handlers.Runs)
@@ -104,22 +121,8 @@ func main() {
 		}
 	}()
 
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		log.Error("Get interface adress error: ", err.Error())
-		os.Exit(1)
-	}
-	for _, a := range addrs {
-		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				host = ipnet.IP.String()
-			}
-		}
-	}
-
 	srv := &http.Server{
-		Addr: host + ":" + listenport,
-		// Addr:         "0.0.0.0:" + listenport,
+		Addr:         host,
 		WriteTimeout: writeTimeout,
 		ReadTimeout:  readTimeout,
 		IdleTimeout:  idleTimeout,
