@@ -18,7 +18,7 @@ func TestTypes(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		id := c.Query("id")
@@ -29,36 +29,41 @@ func TestTypes(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		spaceName := c.Query("space")
 		if spaceName == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param space is empty"})
+			c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
 			return
 		}
 		projectName := c.Query("project")
 		if projectName == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param project is empty"})
+			c.JSON(400, gin.H{"status": "error", "Message": "param project is empty"})
 			return
 		}
 		testTypeName := c.Query("testtype")
-		if projectName == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param release is empty"})
+		if testTypeName == "" {
+			res, err := adapter.GetTestTypes(spaceName, projectName)
+			if err != nil {
+				CheckSQLError(c, err)
+				return
+			}
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
-		res, err := adapter.GetTestType(spaceName, testTypeName, projectName)
+		res, err := adapter.GetTestType(spaceName, projectName, testTypeName)
 		if err != nil {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, res)
+		c.JSON(200, gin.H{"status": "ok", "data": res})
 		return
 	case http.MethodPost:
 		testType := adapter.TestType{}
 		err := c.BindJSON(&testType)
 		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
 		testType.ID = uuid.New()
@@ -67,13 +72,13 @@ func TestTypes(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Test type created", "ID": testType.ID.String()})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Test type created", "ID": testType.ID.String()})
 		return
 	case http.MethodPut:
 		testType := adapter.TestType{}
 		err := c.BindJSON(&testType)
 		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
 		_, err = testType.Update()
@@ -81,12 +86,12 @@ func TestTypes(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Test type updates"})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Test type updates"})
 		return
 	case http.MethodDelete:
 		id := c.Query("id")
 		if id == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param id is empty"})
+			c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
 			return
 		}
 		uuid := uuid.MustParse(id)
@@ -95,6 +100,6 @@ func TestTypes(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Test type deleted"})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Test type deleted"})
 	}
 }

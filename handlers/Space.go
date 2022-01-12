@@ -18,7 +18,7 @@ func Spaces(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		id := c.Query("id")
@@ -29,7 +29,7 @@ func Spaces(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		space := c.Query("space")
@@ -39,14 +39,14 @@ func Spaces(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 	case http.MethodPost:
 		space := adapter.Space{}
 		err := c.BindJSON(&space)
 		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
 		space.ID = uuid.New()
@@ -55,13 +55,13 @@ func Spaces(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Space created", "ID": space.ID.String()})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Space created", "ID": space.ID.String()})
 		return
 	case http.MethodPut:
 		space := adapter.Space{}
 		err := c.BindJSON(&space)
 		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
 		_, err = space.Update()
@@ -69,12 +69,12 @@ func Spaces(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Space updates"})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Space updates"})
 		return
 	case http.MethodDelete:
 		id := c.Query("id")
 		if id == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param id is empty"})
+			c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
 			return
 		}
 		uuid := uuid.MustParse(id)
@@ -83,6 +83,6 @@ func Spaces(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Space deleted"})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Space deleted"})
 	}
 }
