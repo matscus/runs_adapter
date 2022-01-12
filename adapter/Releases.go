@@ -37,6 +37,15 @@ func GetAllReleases() (result []Release, err error) {
 func GetRelease(space string, project string, release string) (result Release, err error) {
 	return result, DB.Get(&result, "SELECT r.* FROM tests.tReleases AS r  INNER JOIN tests.tProjects AS p ON r.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE s.name=$1 AND p.name=$2 ABD r.name =$3", space, project, release)
 }
+
+func GetReleases(space string, project string) (result []Release, err error) {
+	err = DB.Select(&result, "SELECT r.* FROM tests.tReleases AS r  INNER JOIN tests.tProjects AS p ON r.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE s.name=$1 AND p.name=$2", space, project)
+	if err == nil && result == nil {
+		return nil, sql.ErrNoRows
+	}
+	return result, err
+}
+
 func GetReleaseID(projectID uuid.UUID, release string) (result uuid.UUID, err error) {
 	return result, DB.Get(&result, "SELECT r.id FROM tests.tReleases AS r  WHERE r.project_id=$1 AND r.name=$2", projectID, release)
 }
