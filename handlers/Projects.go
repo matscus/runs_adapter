@@ -18,7 +18,7 @@ func Projects(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		id := c.Query("id")
@@ -29,17 +29,22 @@ func Projects(c *gin.Context) {
 				CheckSQLError(c, err)
 				return
 			}
-			c.JSON(200, res)
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		spaceName := c.Query("space")
 		if spaceName == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param space is empty"})
+			c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
 			return
 		}
 		projectName := c.Query("project")
 		if projectName == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param project is empty"})
+			res, err := adapter.GetProjects(spaceName)
+			if err != nil {
+				CheckSQLError(c, err)
+				return
+			}
+			c.JSON(200, gin.H{"status": "ok", "data": res})
 			return
 		}
 		res, err := adapter.GetProject(spaceName, projectName)
@@ -47,13 +52,13 @@ func Projects(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, res)
+		c.JSON(200, gin.H{"status": "ok", "data": res})
 		return
 	case http.MethodPost:
 		project := adapter.Project{}
 		err := c.BindJSON(&project)
 		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
 		project.ID = uuid.New()
@@ -62,13 +67,13 @@ func Projects(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Project created", "ID": project.ID.String()})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Project created", "ID": project.ID.String()})
 		return
 	case http.MethodPut:
 		project := adapter.Project{}
 		err := c.BindJSON(&project)
 		if err != nil {
-			c.JSON(500, gin.H{"Status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
 		_, err = project.Update()
@@ -76,12 +81,12 @@ func Projects(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Project updated"})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Project updated"})
 		return
 	case http.MethodDelete:
 		id := c.Query("id")
 		if id == "" {
-			c.JSON(400, gin.H{"Status": "error", "Message": "param id is empty"})
+			c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
 			return
 		}
 		uuid := uuid.MustParse(id)
@@ -90,6 +95,6 @@ func Projects(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"Status": "ok", "Message": "Project deleted"})
+		c.JSON(200, gin.H{"status": "ok", "Message": "Project deleted"})
 	}
 }
