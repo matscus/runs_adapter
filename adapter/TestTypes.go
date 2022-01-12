@@ -33,7 +33,15 @@ func GetAllTestTypes() (result []TestType, err error) {
 }
 
 func GetTestType(space string, project string, testType string) (result TestType, err error) {
-	return result, DB.Get(&result, "SELECT t.* FROM tests.tTestTypes AS t INNER JOIN tests.tProjects AS p ON t.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE  s.name=$1 AND p.name=$2 AND t.name ='$3", space, project, testType)
+	return result, DB.Get(&result, "SELECT t.* FROM tests.tTestTypes AS t INNER JOIN tests.tProjects AS p ON t.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE  s.name=$1 AND p.name=$2 AND t.name =$3", space, project, testType)
+}
+
+func GetTestTypes(space string, project string) (result []TestType, err error) {
+	err = DB.Select(&result, "SELECT t.* FROM tests.tTestTypes AS t INNER JOIN tests.tProjects AS p ON t.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE  s.name=$1 AND p.name=$2", space, project)
+	if err == nil && result == nil {
+		return nil, sql.ErrNoRows
+	}
+	return result, err
 }
 
 func GetTestTypeID(projectID uuid.UUID, name string) (id uuid.UUID, err error) {
