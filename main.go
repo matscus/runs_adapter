@@ -26,7 +26,7 @@ var (
 )
 
 func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(1)
 }
 func main() {
 	flag.StringVar(&pemPath, "pempath", os.Getenv("SERVERREM"), "path to pem file")
