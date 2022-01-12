@@ -37,6 +37,13 @@ func GetAllVersions() (result []Version, err error) {
 func GetVersion(space string, project string, release string, version string) (result Version, err error) {
 	return result, DB.Get(&result, "SELECT v.* FROM tests.tVersions AS v INNER JOIN tests.tReleases AS r ON v.release_id = r.id INNER JOIN tests.tProjects AS p ON r.project_id = p.id INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE  s.name=$1 AND r.name =$2 AND p.name=$3 AND  v.name=$4", space, project, release, version)
 }
+func GetVersions(space string, project string, release string) (result []Version, err error) {
+	err = DB.Select(&result, "SELECT v.* FROM tests.tVersions AS v INNER JOIN tests.tReleases AS r ON v.release_id = r.id INNER JOIN tests.tProjects AS p ON r.project_id = p.id INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE  s.name=$1 AND p.name=$2 AND r.name=$3 ORDER BY version_date_time DESC", space, project, release)
+	if err == nil && result == nil {
+		return nil, sql.ErrNoRows
+	}
+	return result, err
+}
 
 func GetVersionID(releaseID uuid.UUID, name string) (id uuid.UUID, err error) {
 	return id, DB.Get(&id, "SELECT id FROM tests.tVersions WHERE release_id=$1 and name=$2", releaseID, name)
