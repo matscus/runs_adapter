@@ -14,7 +14,7 @@ type Space struct {
 }
 
 func (s Space) Create() (sql.Result, error) {
-	return DB.NamedExec(`INSERT INTO tests.tSpaces (id,name,login,password) VALUES(:id, :name,:login,:password)`, s)
+	return DB.NamedExec(`INSERT INTO tests.tSpaces (id,name,login,password) VALUES(:id,:name,:login,:password)`, s)
 }
 
 func (s Space) Update() (sql.Result, error) {
