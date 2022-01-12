@@ -35,6 +35,13 @@ func GetAllProjects() (result []Project, err error) {
 func GetProject(space string, name string) (result Project, err error) {
 	return result, DB.Get(&result, "SELECT p.* FROM tests.tProjects AS p INNER JOIN tests.tSpaces AS s ON p.space_id=s.id WHERE s.name=$1 AND p.name=$2", space, name)
 }
+func GetProjects(space string) (result []Project, err error) {
+	err = DB.Select(&result, "SELECT p.* FROM tests.tProjects AS p INNER JOIN tests.tSpaces AS s ON p.space_id=s.id WHERE s.name=$1", space)
+	if err == nil && result == nil {
+		return nil, sql.ErrNoRows
+	}
+	return result, err
+}
 
 func GetProjectID(spaceID uuid.UUID, name string) (id uuid.UUID, err error) {
 	return id, DB.Get(&id, "SELECT id FROM tests.tProjects WHERE space_id=$1 and name=$2", spaceID, name)
