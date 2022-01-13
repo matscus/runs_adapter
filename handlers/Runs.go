@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 	"runs_adapter/adapter"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -296,6 +298,31 @@ func TestTypeRuns(c *gin.Context) {
 		return
 	}
 	res, err := adapter.GetAllRunsByTestType(spaceName, projectName, releaseName, versionName, testtypeName)
+	if err != nil {
+		CheckSQLError(c, err)
+		return
+	}
+	c.JSON(200, gin.H{"status": "ok", "data": res})
+}
+
+func SetEndTime(c *gin.Context) {
+	id := c.Query("id")
+	if id == "" {
+		c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
+		return
+	}
+	endtime := c.Query("endtime")
+	if id == "" {
+		c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
+		return
+	}
+	uuid := uuid.MustParse(id)
+	t, err := strconv.ParseInt(endtime, 10, 64)
+	if err != nil {
+		c.JSON(500, gin.H{"status": "error", "Message": err})
+		return
+	}
+	res, err := adapter.SetEndTime(uuid, time.Unix(t, 0))
 	if err != nil {
 		CheckSQLError(c, err)
 		return

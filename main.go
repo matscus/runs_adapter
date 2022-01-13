@@ -106,6 +106,7 @@ func main() {
 			runs.GET("/release", handlers.ReleaseRuns)
 			runs.GET("/version", handlers.VersionRuns)
 			runs.GET("/testtype", handlers.TestTypeRuns)
+			runs.POST("/setendtime", handlers.SetEndTime)
 		}
 	}
 	go func() {

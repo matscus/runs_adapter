@@ -119,6 +119,10 @@ func GetAllRunsByTestType(schema string, project string, release string, version
 	return result, err
 }
 
+func SetEndTime(id uuid.UUID, endTime time.Time) (sql.Result, error) {
+	return DB.Exec(`UPDATE tests.tRuns SET end_time=$1 WHERE id=$2`, endTime, id)
+}
+
 func (a Data) Value() (driver.Value, error) {
 	return json.Marshal(a)
 }
