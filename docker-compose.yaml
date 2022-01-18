@@ -6,11 +6,11 @@ networks:
 
 services:
   runs_adapter:
-    image: $REGISTRY/runs_adapter  
+    image: ${REGISTRY_NODE}/runs_adapter  
     networks:
       - swarm_net
     ports:
-      - 8090:8090
+      - ${RUN_ADAPTER_PORT}:9443
     deploy:
         replicas: 1
         resources:

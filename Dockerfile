@@ -21,4 +21,4 @@ WORKDIR /application
 
 COPY --from=builder /application/engine /application
 
-CMD /application/engine
+CMD ["/application/engine", "--dbhost", "127.0.0.1", "--dbname", "ammunition"]
