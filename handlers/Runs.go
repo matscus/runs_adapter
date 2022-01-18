@@ -41,7 +41,7 @@ func Runs(c *gin.Context) {
 		run := adapter.Run{}
 		err := c.BindJSON(&run)
 		if err != nil {
-			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "message": err.Error()})
 			return
 		}
 		run.ID = uuid.New()
@@ -126,7 +126,7 @@ func Runs(c *gin.Context) {
 			}
 		}
 		if run.RunID == 0 {
-			c.JSON(400, gin.H{"status": "error", "Message": "Fields RunID must not be 0 "})
+			c.JSON(400, gin.H{"status": "error", "message": "Fields RunID must not be 0 "})
 			return
 		}
 		_, err = run.Create()
@@ -134,13 +134,13 @@ func Runs(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"status": "ok", "Message": "Run created", "ID": run.ID.String()})
+		c.JSON(200, gin.H{"status": "ok", "message": "Run created", "id": run.ID.String()})
 		return
 	case http.MethodPut:
 		run := adapter.Run{}
 		err := c.BindJSON(&run)
 		if err != nil {
-			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
+			c.JSON(500, gin.H{"status": "error", "message": err.Error()})
 			return
 		}
 		_, err = run.Update()
@@ -148,12 +148,12 @@ func Runs(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"status": "ok", "Message": "Run updated", "ID": run.ID.String()})
+		c.JSON(200, gin.H{"status": "ok", "message": "run updated", "id": run.ID.String()})
 		return
 	case http.MethodDelete:
 		id := c.Query("id")
 		if id == "" {
-			c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
+			c.JSON(400, gin.H{"status": "error", "message": "param id is empty"})
 			return
 		}
 		uuid := uuid.MustParse(id)
@@ -162,19 +162,19 @@ func Runs(c *gin.Context) {
 			CheckSQLError(c, err)
 			return
 		}
-		c.JSON(200, gin.H{"status": "ok", "Message": "Run deleted"})
+		c.JSON(200, gin.H{"status": "ok", "message": "Run deleted"})
 	}
 }
 
 func LastRunID(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
 		return
 	}
 	projectName := c.Query("project")
 	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param project is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
 		return
 	}
 	res, err := adapter.GetLastRunID(spaceName, projectName)
@@ -188,7 +188,7 @@ func LastRunID(c *gin.Context) {
 func SpaceRuns(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
 		return
 	}
 	res, err := adapter.GetAllRunsBySpace(spaceName)
@@ -202,12 +202,12 @@ func SpaceRuns(c *gin.Context) {
 func ProjectRuns(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
 		return
 	}
 	projectName := c.Query("project")
 	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param project is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
 		return
 	}
 	res, err := adapter.GetAllRunsByProject(spaceName, projectName)
@@ -221,17 +221,17 @@ func ProjectRuns(c *gin.Context) {
 func ReleaseRuns(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
 		return
 	}
 	projectName := c.Query("project")
 	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param project is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
 		return
 	}
 	releaseName := c.Query("release")
 	if releaseName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param release is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param release is empty"})
 		return
 	}
 	res, err := adapter.GetAllRunsByRelease(spaceName, projectName, releaseName)
@@ -245,22 +245,22 @@ func ReleaseRuns(c *gin.Context) {
 func VersionRuns(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
 		return
 	}
 	projectName := c.Query("project")
 	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param project is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
 		return
 	}
 	releaseName := c.Query("release")
 	if releaseName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param release is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param release is empty"})
 		return
 	}
 	versionName := c.Query("version")
 	if versionName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param version is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param version is empty"})
 		return
 	}
 	res, err := adapter.GetAllRunsByVersion(spaceName, projectName, releaseName, versionName)
@@ -274,27 +274,27 @@ func VersionRuns(c *gin.Context) {
 func TestTypeRuns(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param space is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
 		return
 	}
 	projectName := c.Query("project")
 	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param project is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
 		return
 	}
 	releaseName := c.Query("release")
 	if releaseName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param release is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param release is empty"})
 		return
 	}
 	versionName := c.Query("version")
 	if versionName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param version is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param version is empty"})
 		return
 	}
 	testtypeName := c.Query("testtype")
 	if testtypeName == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param testtype is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param testtype is empty"})
 		return
 	}
 	res, err := adapter.GetAllRunsByTestType(spaceName, projectName, releaseName, versionName, testtypeName)
@@ -308,18 +308,18 @@ func TestTypeRuns(c *gin.Context) {
 func SetEndTime(c *gin.Context) {
 	id := c.Query("id")
 	if id == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param id is empty"})
 		return
 	}
 	endtime := c.Query("endtime")
 	if id == "" {
-		c.JSON(400, gin.H{"status": "error", "Message": "param id is empty"})
+		c.JSON(400, gin.H{"status": "error", "message": "param id is empty"})
 		return
 	}
 	uuid := uuid.MustParse(id)
 	t, err := strconv.ParseInt(endtime, 10, 64)
 	if err != nil {
-		c.JSON(500, gin.H{"status": "error", "Message": err})
+		c.JSON(500, gin.H{"status": "error", "message": err})
 		return
 	}
 	res, err := adapter.SetEndTime(uuid, time.Unix(t, 0))
