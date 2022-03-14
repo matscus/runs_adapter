@@ -169,7 +169,10 @@ func Runs(c *gin.Context) {
 func LastRunID(c *gin.Context) {
 	res, err := adapter.GetLastRunID()
 	if err != nil {
-		CheckSQLError(c, err)
+		if err == sql.ErrNoRows {
+			c.JSON(200, gin.H{"status": "ok", "data": gin.H{"RunID": 0}})
+			return
+		}
 		return
 	}
 	c.JSON(200, gin.H{"status": "ok", "data": gin.H{"RunID": res}})
