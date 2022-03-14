@@ -6,7 +6,7 @@ networks:
 
 services:
   runs_adapter:
-    image: ${REGISTRY_NODE}/runs_adapter  
+    image: registry.detmir.ru/performance_runs_adapter
     networks:
       - swarm_net
     ports:
