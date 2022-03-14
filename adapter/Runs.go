@@ -64,7 +64,7 @@ func GetAllRuns() (result []Run, err error) {
 }
 
 func GetLastRunID() (result int, err error) {
-	return result, DB.Get(&result, "SELECT max(run_id) FROM tests.tRuns")
+	return result, DB.Get(&result, "SELECT run_id FROM tests.tRuns ORDER BY run_id DESC LIMIT 1")
 }
 
 func GetRuns(schema string, project string, limit int) (result []Run, err error) {
