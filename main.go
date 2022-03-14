@@ -42,9 +42,9 @@ func main() {
 	flag.DurationVar(&idleTimeout, "idle-timeout", time.Second*60, "idle server timeout")
 	flag.StringVar(&dbuser, "user", "postgres", "db user")
 	flag.StringVar(&dbpassword, "password", `postgres`, "db user password")
-	flag.StringVar(&dbhost, "dbhost", "127.0.0.1", "db host")
+	flag.StringVar(&dbhost, "dbhost", "nt-metrics.detmir-infra.ru", "db host")
 	flag.IntVar(&dbport, "dbport", 5432, "db port")
-	flag.StringVar(&dbname, "dbname", "test", "db name")
+	flag.StringVar(&dbname, "dbname", "runs", "db name")
 	flag.Parse()
 
 	if !debug {
