@@ -167,17 +167,7 @@ func Runs(c *gin.Context) {
 }
 
 func LastRunID(c *gin.Context) {
-	spaceName := c.Query("space")
-	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
-		return
-	}
-	projectName := c.Query("project")
-	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
-		return
-	}
-	res, err := adapter.GetLastRunID(spaceName, projectName)
+	res, err := adapter.GetLastRunID()
 	if err != nil {
 		CheckSQLError(c, err)
 		return
