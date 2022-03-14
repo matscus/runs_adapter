@@ -10,7 +10,7 @@ services:
     networks:
       - swarm_net
     ports:
-      - ${RUN_ADAPTER_PORT}:9443
+      - 9443:9443
     deploy:
         replicas: 1
         resources:
