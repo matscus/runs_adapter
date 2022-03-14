@@ -21,4 +21,4 @@ WORKDIR /application
 
 COPY --from=builder /application/engine /application
 
-CMD ["/application/engine", "--dbhost", "${POSTHRESQL_NODE}", "--dbname", "${PUSHER_DB_NAME}"]
+CMD ["/application/engine"]
