@@ -5,7 +5,7 @@ networks:
     external: true
 
 services:
-  runs_adapter:
+  runs:
     image: registry.detmir.ru/performance_runs_adapter
     networks:
       - swarm_net
