@@ -63,8 +63,8 @@ func GetAllRuns() (result []Run, err error) {
 	return result, err
 }
 
-func GetLastRunID() (result int, err error) {
-	return result, DB.Get(&result, "SELECT run_id FROM tests.tRuns ORDER BY run_id DESC LIMIT 1")
+func GetLastRunID(schema string, project string) (result int, err error) {
+	return result, DB.Get(&result, "SELECT t.run_id FROM tests.tRuns AS t INNER JOIN tests.tSpaces AS s ON t.space_id = s.id INNER JOIN tests.tProjects AS p ON t.project_id = p.id WHERE s.name=$1 AND p.name=$2 ORDER BY run_id DESC LIMIT 1", schema, project)
 }
 
 func GetRuns(schema string, project string, limit int) (result []Run, err error) {
