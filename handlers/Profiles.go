@@ -79,7 +79,7 @@ func Profiles(c *gin.Context) {
 			return
 		}
 		new := false
-		oldProfile, err := adapter.GetProfile(profile.SpaceName, profile.ProjectName, profile.ReleaseName, profile.VersionName, profile.TestTypeName, profile.Name)
+		oldProfile, err := adapter.GetProfile(profile.SpaceName, profile.ProjectName, profile.ReleaseName, profile.VersionName, profile.TestTypeName, profile.ScenarioName)
 		if err == sql.ErrNoRows {
 			profile.ID = uuid.New()
 			new = true
