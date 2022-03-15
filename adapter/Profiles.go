@@ -25,7 +25,7 @@ type Profile struct {
 	RumpUpStepsCount int       `json:"rump_up_steps_count,omitempty" binding:"required" db:"rump_up_steps_count"`
 	TestDuration     int       `json:"test_duration,omitempty" binding:"required" db:"test_duration"`
 	Replicas         int       `json:"replicas,omitempty" binding:"required" db:"replicas"`
-	CPU              int       `json:"cpu,omitempty" binding:"required" db:"cpu"`
+	CPU              float64   `json:"cpu,omitempty" binding:"required" db:"cpu"`
 	Memory           int       `json:"memory,omitempty" binding:"required" db:"memory"`
 }
 
