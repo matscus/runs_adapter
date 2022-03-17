@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"net/http"
 	"runs_adapter/adapter"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -317,15 +316,16 @@ func SetEndTime(c *gin.Context) {
 		return
 	}
 	uuid := uuid.MustParse(id)
-	t, err := strconv.ParseInt(endtime, 10, 64)
+	layout := "2006-01-02T15:04:05.000Z"
+	t, err := time.Parse(layout, endtime)
 	if err != nil {
 		c.JSON(500, gin.H{"status": "error", "message": err})
 		return
 	}
-	res, err := adapter.SetEndTime(uuid, time.Unix(t, 0))
+	_, err = adapter.SetEndTime(uuid, t)
 	if err != nil {
 		CheckSQLError(c, err)
 		return
 	}
-	c.JSON(200, gin.H{"status": "ok", "data": res})
+	c.JSON(200, gin.H{"status": "ok"})
 }
