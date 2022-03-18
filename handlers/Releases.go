@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -43,7 +44,8 @@ func Releases(c *gin.Context) {
 			return
 		}
 		releaseName := c.Query("release")
-		if projectName == "" {
+		if releaseName == "" {
+			fmt.Println("GetReleases")
 			res, err := adapter.GetReleases(spaceName, projectName)
 			if err != nil {
 				CheckSQLError(c, err)
