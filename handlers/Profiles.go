@@ -80,7 +80,7 @@ func Profiles(c *gin.Context) {
 		}
 		new := false
 		oldProfile, err := adapter.GetProfile(profile.SpaceName, profile.ProjectName, profile.ReleaseName, profile.VersionName, profile.TestTypeName, profile.ScenarioName)
-		fmt.Println(oldProfile)
+
 		if err == sql.ErrNoRows {
 			profile.ID = uuid.New()
 			new = true
@@ -167,7 +167,6 @@ func Profiles(c *gin.Context) {
 				}
 			}
 		}
-
 		if new {
 			_, err = profile.Create()
 			if err != nil {

@@ -30,7 +30,7 @@ type Profile struct {
 }
 
 func (p Profile) Create() (sql.Result, error) {
-	return DB.NamedExec(`INSERT INTO tests.tProfiles (id,scenario_name,space_id,project_id,release_id,version_id,test_type_id,tps,sla,rump_up_time,rump_up_steps_count,test_duration,replicas,cpu,memory) VALUES(:id,:name,:space_id,:project_id,:release_id,:version_id,:test_type_id,:tps,:sla,:rump_up_time,:rump_up_steps_count,:test_duration,:replicas,:cpu,:memory)`, p)
+	return DB.NamedExec(`INSERT INTO tests.tProfiles (id,scenario_name,space_id,project_id,release_id,version_id,test_type_id,tps,sla,rump_up_time,rump_up_steps_count,test_duration,replicas,cpu,memory) VALUES(:id,:scenario_name,:space_id,:project_id,:release_id,:version_id,:test_type_id,:tps,:sla,:rump_up_time,:rump_up_steps_count,:test_duration,:replicas,:cpu,:memory)`, p)
 }
 
 func (p Profile) Update() (sql.Result, error) {

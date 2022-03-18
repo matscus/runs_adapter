@@ -15,7 +15,7 @@ type Version struct {
 }
 
 func (v Version) Create() (sql.Result, error) {
-	return DB.NamedExec(`INSERT INTO tests.tVersions(id,name,version_date_time,release_id) VALUES(:id,:name,:version_date_time,:release_id)`, v)
+	return DB.NamedExec(`INSERT INTO tests.tVersions(id,name,version_date_time,release_id) VALUES(:id,:name,now(),:release_id)`, v)
 }
 
 func (v Version) Update() (sql.Result, error) {
@@ -27,7 +27,7 @@ func (v Version) Delete() (sql.Result, error) {
 }
 
 func GetAllVersions() (result []Version, err error) {
-	err = DB.Select(&result, "SELECT * FROM tests.tVersions")
+	err = DB.Select(&result, "SELECT * FROM tests.tVersions ORDER BY version_date_time DESC")
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}

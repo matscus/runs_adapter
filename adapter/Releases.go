@@ -15,7 +15,7 @@ type Release struct {
 }
 
 func (r Release) Create() (sql.Result, error) {
-	return DB.NamedExec(`INSERT INTO tests.tReleases (id,name,release_date_time,project_id) VALUES(:id, :name,:release_date_time,:project_id)`, r)
+	return DB.NamedExec(`INSERT INTO tests.tReleases (id,name,release_date_time,project_id) VALUES(:id, :name,now(),:project_id)`, r)
 }
 
 func (r Release) Update() (sql.Result, error) {
@@ -27,7 +27,7 @@ func (r Release) Delete() (sql.Result, error) {
 }
 
 func GetAllReleases() (result []Release, err error) {
-	err = DB.Select(&result, "SELECT * FROM tests.tReleases")
+	err = DB.Select(&result, "SELECT * FROM tests.tReleases ORDER BY release_date_time DESC")
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
@@ -35,11 +35,11 @@ func GetAllReleases() (result []Release, err error) {
 }
 
 func GetRelease(space string, project string, release string) (result Release, err error) {
-	return result, DB.Get(&result, "SELECT r.* FROM tests.tReleases AS r  INNER JOIN tests.tProjects AS p ON r.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE s.name=$1 AND p.name=$2 ABD r.name =$3", space, project, release)
+	return result, DB.Get(&result, "SELECT r.* FROM tests.tReleases AS r INNER JOIN tests.tProjects AS p ON r.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE s.name=$1 AND p.name=$2 AND r.name=$3", space, project, release)
 }
 
 func GetReleases(space string, project string) (result []Release, err error) {
-	err = DB.Select(&result, "SELECT r.* FROM tests.tReleases AS r  INNER JOIN tests.tProjects AS p ON r.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE s.name=$1 AND p.name=$2", space, project)
+	err = DB.Select(&result, "SELECT r.* FROM tests.tReleases AS r  INNER JOIN tests.tProjects AS p ON r.project_id = p.id  INNER JOIN tests.tSpaces AS s ON p.space_id = s.id WHERE s.name=$1 AND p.name=$2 ORDER BY release_date_time DESC", space, project)
 	if err == nil && result == nil {
 		return nil, sql.ErrNoRows
 	}
