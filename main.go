@@ -57,7 +57,8 @@ func main() {
 		for _, a := range addrs {
 			if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 				if ipnet.IP.To4() != nil {
-					host = fmt.Sprintf("%s:%s", ipnet.IP.String(), listenport)
+					//host = fmt.Sprintf("%s:%s", ipnet.IP.String(), listenport)
+					host = fmt.Sprintf("%s:%s", "0.0.0.0", listenport)
 				}
 			}
 		}
