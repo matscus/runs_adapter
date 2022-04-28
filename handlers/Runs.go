@@ -92,12 +92,12 @@ func Runs(c *gin.Context) {
 				}
 			}
 		}
-		if run.VersionID == nilUUID {
-			run.VersionID, err = adapter.GetVersionID(run.ReleaseID, run.VersionName)
+		if run.TestTypeID == nilUUID {
+			run.TestTypeID, err = adapter.GetTestTypeID(run.ProjectID, run.TestTypeName)
 			if err != nil {
 				if err == sql.ErrNoRows {
-					run.VersionID = uuid.New()
-					_, err = adapter.Version{ID: run.VersionID, Name: run.VersionName, ReleaseID: run.ReleaseID}.Create()
+					run.TestTypeID = uuid.New()
+					_, err = adapter.TestType{ID: run.TestTypeID, Name: run.TestTypeName, ProjectID: run.ProjectID}.Create()
 					if err != nil {
 						CheckSQLError(c, err)
 						return
@@ -108,12 +108,11 @@ func Runs(c *gin.Context) {
 				}
 			}
 		}
-		if run.TestTypeID == nilUUID {
-			run.TestTypeID, err = adapter.GetTestTypeID(run.ProjectID, run.TestTypeName)
+		if run.LoadTypeID == nilUUID {
+			run.LoadTypeID, err = adapter.GetLoadTypeID(run.TestTypeName)
 			if err != nil {
 				if err == sql.ErrNoRows {
-					run.TestTypeID = uuid.New()
-					_, err = adapter.TestType{ID: run.TestTypeID, Name: run.TestTypeName, ProjectID: run.ProjectID}.Create()
+					run.LoadTypeID, err = adapter.GetDefaultLoadTypeID()
 					if err != nil {
 						CheckSQLError(c, err)
 						return
@@ -241,35 +240,6 @@ func ReleaseRuns(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "ok", "data": res})
 }
 
-func VersionRuns(c *gin.Context) {
-	spaceName := c.Query("space")
-	if spaceName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
-		return
-	}
-	projectName := c.Query("project")
-	if projectName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
-		return
-	}
-	releaseName := c.Query("release")
-	if releaseName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param release is empty"})
-		return
-	}
-	versionName := c.Query("version")
-	if versionName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param version is empty"})
-		return
-	}
-	res, err := adapter.GetAllRunsByVersion(spaceName, projectName, releaseName, versionName)
-	if err != nil {
-		CheckSQLError(c, err)
-		return
-	}
-	c.JSON(200, gin.H{"status": "ok", "data": res})
-}
-
 func TestTypeRuns(c *gin.Context) {
 	spaceName := c.Query("space")
 	if spaceName == "" {
@@ -286,9 +256,33 @@ func TestTypeRuns(c *gin.Context) {
 		c.JSON(400, gin.H{"status": "error", "message": "param release is empty"})
 		return
 	}
-	versionName := c.Query("version")
-	if versionName == "" {
-		c.JSON(400, gin.H{"status": "error", "message": "param version is empty"})
+	testtypeName := c.Query("testtype")
+	if testtypeName == "" {
+		c.JSON(400, gin.H{"status": "error", "message": "param testtype is empty"})
+		return
+	}
+	res, err := adapter.GetAllRunsByTestType(spaceName, projectName, releaseName, testtypeName)
+	if err != nil {
+		CheckSQLError(c, err)
+		return
+	}
+	c.JSON(200, gin.H{"status": "ok", "data": res})
+}
+
+func LoadTypeRuns(c *gin.Context) {
+	spaceName := c.Query("space")
+	if spaceName == "" {
+		c.JSON(400, gin.H{"status": "error", "message": "param space is empty"})
+		return
+	}
+	projectName := c.Query("project")
+	if projectName == "" {
+		c.JSON(400, gin.H{"status": "error", "message": "param project is empty"})
+		return
+	}
+	releaseName := c.Query("release")
+	if releaseName == "" {
+		c.JSON(400, gin.H{"status": "error", "message": "param release is empty"})
 		return
 	}
 	testtypeName := c.Query("testtype")
@@ -296,7 +290,12 @@ func TestTypeRuns(c *gin.Context) {
 		c.JSON(400, gin.H{"status": "error", "message": "param testtype is empty"})
 		return
 	}
-	res, err := adapter.GetAllRunsByTestType(spaceName, projectName, releaseName, versionName, testtypeName)
+	loadtypeName := c.Query("loadtype")
+	if testtypeName == "" {
+		c.JSON(400, gin.H{"status": "error", "message": "param testtype is empty"})
+		return
+	}
+	res, err := adapter.GetAllRunsByLoadType(spaceName, projectName, releaseName, testtypeName, loadtypeName)
 	if err != nil {
 		CheckSQLError(c, err)
 		return
