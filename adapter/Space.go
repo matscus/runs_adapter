@@ -7,18 +7,16 @@ import (
 )
 
 type Space struct {
-	ID       uuid.UUID `json:"id" db:"id"`
-	Name     string    `json:"name" binding:"required" db:"name"`
-	Login    string    `json:"login" db:"login"`
-	Password string    `json:"password" db:"password"`
+	ID   uuid.UUID `json:"id" db:"id"`
+	Name string    `json:"name" binding:"required" db:"name"`
 }
 
 func (s Space) Create() (sql.Result, error) {
-	return DB.NamedExec(`INSERT INTO tests.tSpaces (id,name,login,password) VALUES(:id,:name,:login,:password)`, s)
+	return DB.NamedExec(`INSERT INTO tests.tSpaces (id,name) VALUES(:id,:name)`, s)
 }
 
 func (s Space) Update() (sql.Result, error) {
-	return DB.Exec(`UPDATE tests.tSpaces SET name=$1, login=$2 ,password=$3 WHERE id=$4`, s.Name, s.Login, s.Password, s.ID)
+	return DB.Exec(`UPDATE tests.tSpaces SET name=$1, login=$2 ,password=$3 WHERE id=$4`, s.Name, s.ID)
 }
 
 func (s Space) Delete() (sql.Result, error) {

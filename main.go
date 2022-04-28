@@ -44,7 +44,7 @@ func main() {
 	flag.StringVar(&dbpassword, "password", `postgres`, "db user password")
 	flag.StringVar(&dbhost, "dbhost", "nt-metrics.detmir-infra.ru", "db host")
 	flag.IntVar(&dbport, "dbport", 5432, "db port")
-	flag.StringVar(&dbname, "dbname", "runs", "db name")
+	flag.StringVar(&dbname, "dbname", "dev", "db name")
 	flag.Parse()
 
 	if !debug {
@@ -57,7 +57,8 @@ func main() {
 		for _, a := range addrs {
 			if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 				if ipnet.IP.To4() != nil {
-					host = fmt.Sprintf("%s:%s", ipnet.IP.String(), listenport)
+					//host = fmt.Sprintf("%s:%s", ipnet.IP.String(), listenport)
+					host = fmt.Sprintf("%s:%s", "0.0.0.0", listenport)
 				}
 			}
 		}
@@ -94,8 +95,8 @@ func main() {
 		v1.Any("/spaces", handlers.Spaces)
 		v1.Any("/projects", handlers.Projects)
 		v1.Any("/releases", handlers.Releases)
-		v1.Any("/versions", handlers.Versions)
 		v1.Any("/testtypes", handlers.TestTypes)
+		v1.Any("/loadtypes", handlers.LoadType)
 		v1.Any("/profiles", handlers.Profiles)
 		runs := v1.Group("/runs")
 		{
@@ -104,7 +105,7 @@ func main() {
 			runs.GET("/space", handlers.SpaceRuns)
 			runs.GET("/project", handlers.ProjectRuns)
 			runs.GET("/release", handlers.ReleaseRuns)
-			runs.GET("/version", handlers.VersionRuns)
+			runs.GET("/loadtype", handlers.LoadTypeRuns)
 			runs.GET("/testtype", handlers.TestTypeRuns)
 			runs.POST("/setendtime", handlers.SetEndTime)
 		}

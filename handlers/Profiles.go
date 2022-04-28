@@ -49,21 +49,17 @@ func Profiles(c *gin.Context) {
 			c.JSON(400, gin.H{"status": "error", "Message": "param release is empty"})
 			return
 		}
-		versionName := c.Query("version")
-		if versionName == "" {
-			if releaseName == "" {
-				c.JSON(400, gin.H{"status": "error", "Message": "param version is empty"})
-				return
-			}
-		}
 		testTypeName := c.Query("testtype")
 		if testTypeName == "" {
-			if releaseName == "" {
-				c.JSON(400, gin.H{"status": "error", "Message": "param testtype is empty"})
-				return
-			}
+			c.JSON(400, gin.H{"status": "error", "Message": "param testtype is empty"})
+			return
 		}
-		res, err := adapter.GetProfiles(spaceName, projectName, releaseName, versionName, testTypeName)
+		loadTypeName := c.Query("loadtype")
+		if loadTypeName == "" {
+			c.JSON(400, gin.H{"status": "error", "Message": "param loadtype is empty"})
+			return
+		}
+		res, err := adapter.GetProfiles(spaceName, projectName, releaseName, testTypeName, loadTypeName)
 		if err != nil {
 			CheckSQLError(c, err)
 			return
@@ -79,7 +75,7 @@ func Profiles(c *gin.Context) {
 			return
 		}
 		new := false
-		oldProfile, err := adapter.GetProfile(profile.SpaceName, profile.ProjectName, profile.ReleaseName, profile.VersionName, profile.TestTypeName, profile.ScenarioName)
+		oldProfile, err := adapter.GetProfile(profile.SpaceName, profile.ProjectName, profile.ReleaseName, profile.LoadTypeName, profile.TestTypeName, profile.ScenarioName)
 
 		if err == sql.ErrNoRows {
 			profile.ID = uuid.New()
@@ -135,22 +131,6 @@ func Profiles(c *gin.Context) {
 				}
 			}
 		}
-		if profile.VersionID == nilUUID {
-			profile.VersionID, err = adapter.GetVersionID(profile.ReleaseID, profile.VersionName)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					profile.VersionID = uuid.New()
-					_, err = adapter.Version{ID: profile.VersionID, Name: profile.VersionName, ReleaseID: profile.ReleaseID}.Create()
-					if err != nil {
-						CheckSQLError(c, err)
-						return
-					}
-				} else {
-					CheckSQLError(c, err)
-					return
-				}
-			}
-		}
 		if profile.TestTypeID == nilUUID {
 			profile.TestTypeID, err = adapter.GetTestTypeID(profile.ProjectID, profile.TestTypeName)
 			if err != nil {
@@ -166,6 +146,11 @@ func Profiles(c *gin.Context) {
 					return
 				}
 			}
+		}
+		if profile.LoadTypeID == nilUUID {
+			profile.LoadTypeID, err = adapter.GetLoadTypeID(profile.LoadTypeName)
+			CheckSQLError(c, err)
+			return
 		}
 		if new {
 			_, err = profile.Create()
