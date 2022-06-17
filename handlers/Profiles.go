@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"runs_adapter/adapter"
 
@@ -76,7 +75,6 @@ func Profiles(c *gin.Context) {
 		}
 		new := false
 		oldProfile, err := adapter.GetProfile(profile.SpaceName, profile.ProjectName, profile.ReleaseName, profile.LoadTypeName, profile.TestTypeName, profile.ScenarioName)
-
 		if err == sql.ErrNoRows {
 			profile.ID = uuid.New()
 			new = true
@@ -132,25 +130,18 @@ func Profiles(c *gin.Context) {
 			}
 		}
 		if profile.TestTypeID == nilUUID {
-			profile.TestTypeID, err = adapter.GetTestTypeID(profile.ProjectID, profile.TestTypeName)
+			profile.TestTypeID, err = adapter.GetTestTypeID(profile.TestTypeName)
 			if err != nil {
-				if err == sql.ErrNoRows {
-					profile.TestTypeID = uuid.New()
-					_, err = adapter.TestType{ID: profile.TestTypeID, Name: profile.TestTypeName, ProjectID: profile.ProjectID}.Create()
-					if err != nil {
-						CheckSQLError(c, err)
-						return
-					}
-				} else {
-					CheckSQLError(c, err)
-					return
-				}
+				CheckSQLError(c, err)
+				return
 			}
 		}
 		if profile.LoadTypeID == nilUUID {
 			profile.LoadTypeID, err = adapter.GetLoadTypeID(profile.LoadTypeName)
-			CheckSQLError(c, err)
-			return
+			if err != nil {
+				CheckSQLError(c, err)
+				return
+			}
 		}
 		if new {
 			_, err = profile.Create()
@@ -176,8 +167,6 @@ func Profiles(c *gin.Context) {
 			c.JSON(500, gin.H{"status": "error", "Message": err.Error()})
 			return
 		}
-
-		fmt.Println(profile)
 		_, err = profile.Update()
 		if err != nil {
 			CheckSQLError(c, err)
