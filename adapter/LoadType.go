@@ -32,10 +32,10 @@ func GetLoadTypes() (result []LoadType, err error) {
 }
 
 func GetDefaultLoadTypeID() (id uuid.UUID, err error) {
-	return id, DB.Get(&id, "SELECT id FROM FROM tests.tLoadTypes WHERE and name=$2", "steps")
+	return id, DB.Get(&id, "SELECT id FROM tests.tLoadTypes WHERE name=$1", "steps")
 }
 func GetLoadTypeID(name string) (id uuid.UUID, err error) {
-	return id, DB.Get(&id, "SELECT id FROM FROM tests.tLoadTypes WHERE and name=$2", name)
+	return id, DB.Get(&id, "SELECT id FROM tests.tLoadTypes WHERE name=$1", name)
 }
 func GetLoadTypeByID(id uuid.UUID) (result LoadType, err error) {
 	return result, DB.Get(&result, "SELECT id, name FROM tests.tLoadTypes WHERE id=$1", id)
