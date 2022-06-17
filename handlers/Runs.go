@@ -93,11 +93,11 @@ func Runs(c *gin.Context) {
 			}
 		}
 		if run.TestTypeID == nilUUID {
-			run.TestTypeID, err = adapter.GetTestTypeID(run.ProjectID, run.TestTypeName)
+			run.TestTypeID, err = adapter.GetTestTypeID(run.TestTypeName)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					run.TestTypeID = uuid.New()
-					_, err = adapter.TestType{ID: run.TestTypeID, Name: run.TestTypeName, ProjectID: run.ProjectID}.Create()
+					_, err = adapter.TestType{ID: run.TestTypeID, Name: run.TestTypeName}.Create()
 					if err != nil {
 						CheckSQLError(c, err)
 						return
